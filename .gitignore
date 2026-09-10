@@ -1,1 +1,34 @@
+# personal notes
 checklist.md
+
+# build output
+build/
+build*/
+cmake-build-*/
+*.log
+
+# compiled artifacts (in case any land outside build/)
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.d
+*.su
+
+# CubeMX
+*.ioc.bak
+.mxproject
+
+# CMake stragglers
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# IDE
+.vscode/
+.idea/
+*.launch
+
+# macOS
+.DS_Store
