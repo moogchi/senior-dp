@@ -94,32 +94,13 @@ Key destruction is what survives all of these. An escalated attacker gains privi
 
 ## 4. Methodology and work items
 
-### Phase 0 — Pre-meeting (now)
-
-Establish scope and dependencies before committing.
-
-- [ ] Confirm no TRNG on F411 in the block diagram (design already assumes none)
-- [ ] Confirm OTP block addressing and lock-byte mechanics in RM0383
-- [ ] Read TCG DICE Layering Architecture spec
-- [ ] Read SLSA v1.2 Source track — frames gittuf as spec-aligned, not bolted on
-- [ ] Write the three-row attack table on one page
-- [ ] Write the one-paragraph measurement-vs-artifact-digest problem statement
-- [ ] Arrive with the DP1/DP2 cut already proposed
-
-Questions to resolve:
-
-- [ ] _Patrick:_ does gittuf verification emit a machine-readable result wrappable as an in-toto predicate, or is it shell-out-and-parse?
-- [ ] _Patrick:_ how much GitHub metadata ingestion works today vs. is designed?
-- [ ] _Cappos:_ working demo, or publishable result?
-- [ ] _Cappos:_ is scoping to non-TrustZone parts right, or does he want a certified-hardware comparison?
-- [ ] _Marco:_ what does he want to see as evaluation?
-
 ### Phase 1 — Platform bring-up (Sept → mid-Oct)
 
 Highest schedule risk in the project. Nothing downstream exists until the board reports a hash of what it booted. Start immediately.
 
-- [ ] Blink an LED — validate toolchain, flashing, debugger
-- [ ] Serial console over the Nucleo's onboard ST-LINK VCP (no extra hardware needed)
+- [x] Blink an LED — validate toolchain, flashing, debugger
+- [x] Serial console over the Nucleo's onboard ST-LINK VCP (no extra hardware needed)
+- [x] Import sha256 library and crosscheck using host machine's checksum
 - [ ] Build MCUboot for F411, boot a signed application through it
 - [ ] **Configure MCUboot single-slot** — no OTA. Firmware update is not part of the claim; skipping it saves flash and avoids swap-logic bugs
 - [ ] Read X-CUBE-SBSFU for how ST builds a root of trust without TrustZone
