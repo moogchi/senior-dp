@@ -101,11 +101,11 @@ int main(void) {
 
   // seeing if hashing works
   SHA256_CTX ctx;
-  uint8_t hashed[32];
+  uint8_t digest[32];
   sha256_init(&ctx);
-  sha256_update(&ctx, (const uint8_t *)APP_BASE, 4096);
-  sha256_final(&ctx, hashed);
-  UART_Send_Hex(USART2, hashed, 32);
+  sha256_update(&ctx, (const uint8_t *)APP_BASE, APP_MEASURE_LEN);
+  sha256_final(&ctx, digest);
+  UART_Send_Hex(USART2, digest, 32);
   jump_to_app(APP_BASE);
   /* USER CODE END 2 */
 

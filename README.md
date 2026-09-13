@@ -101,12 +101,11 @@ Highest schedule risk in the project. Nothing downstream exists until the board 
 - [x] Blink an LED — validate toolchain, flashing, debugger
 - [x] Serial console over the Nucleo's onboard ST-LINK VCP (no extra hardware needed)
 - [x] Import sha256 library and crosscheck using host machine's checksum
-- [ ] Build MCUboot for F411, boot a signed application through it
-- [ ] **Configure MCUboot single-slot** — no OTA. Firmware update is not part of the claim; skipping it saves flash and avoids swap-logic bugs
+- [x] Build a small boot stage that hashes and passes onto firmware
 - [ ] Read X-CUBE-SBSFU for how ST builds a root of trust without TrustZone
 - [ ] **Do not set RDP Level 2. It is irreversible and permanently kills SWD.** RDP1 for development only
-- [ ] MCUboot hashes the application region and passes the measurement up
-- [ ] Print the measurement over serial
+- [x] Bootloader hashes the application region and prints the measurement
+- [x] Verify measurement against host-side sha256sum of the same flash region
 
 **Exit criterion:** the board reports a hash of what it booted.
 
