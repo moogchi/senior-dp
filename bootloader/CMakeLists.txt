@@ -55,6 +55,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/boot.c
     Core/Src/transmit.c
     Core/Src/sha256.c
+    Core/Src/hmac.c
 )
 
 # Add include paths

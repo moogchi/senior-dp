@@ -22,7 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "boot.h"
-#include "sha256.h"
+#include "hmac.h"
 #include "transmit.h"
 
 /* USER CODE END Includes */
@@ -99,13 +99,28 @@ int main(void) {
   const char boot_statement[] = "Successfully Booted \r\n";
   UART_Send_String(USART2, boot_statement);
 
-  // seeing if hashing works
-  SHA256_CTX ctx;
-  uint8_t digest[32];
-  sha256_init(&ctx);
-  sha256_update(&ctx, (const uint8_t *)APP_BASE, APP_MEASURE_LEN);
-  sha256_final(&ctx, digest);
-  UART_Send_Hex(USART2, digest, 32);
+  /*
+  static const uint8_t dev_uds_placeholder[32] = {
+  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+      0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+      0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+  };
+  */
+
+  uint8_t test_key[20];
+  for (int i = 0; i < 20; i++) {
+    test_key[i] = 0x0b;
+  }
+
+  const char *test_msg = "Hi There";
+  uint8_t hmac_out[SHA256_DIGEST_SIZE];
+
+  hmac_sha256(hmac_out, test_key, sizeof(test_key), (const uint8_t *)test_msg,
+              8);
+
+  UART_Send_String(USART2, "HMAC test: ");
+  UART_Send_Hex(USART2, hmac_out, SHA256_DIGEST_SIZE);
+
   jump_to_app(APP_BASE);
   /* USER CODE END 2 */
 
