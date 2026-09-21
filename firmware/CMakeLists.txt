@@ -28,6 +28,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 project(${CMAKE_PROJECT_NAME})
 message("Build type: " ${CMAKE_BUILD_TYPE})
 
+# set Os flag
+set(CMAKE_C_FLAGS_DEBUG "-Os -g")
+
 # Enable CMake support for ASM and C languages
 enable_language(C ASM)
 
@@ -36,7 +39,6 @@ add_executable(${CMAKE_PROJECT_NAME})
 
 # Optimization and section-level linking (pinned for reproducibility)
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
-    -Os
     -ffunction-sections
     -fdata-sections
 )

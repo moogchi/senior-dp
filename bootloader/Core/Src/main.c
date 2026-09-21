@@ -111,16 +111,19 @@ int main(void) {
 
   // hash the firmware
   SHA256_CTX ctx;
+  uint8_t firmware_measurement[32];
   sha256_init(&ctx);
+  sha256_update(&ctx, (uint8_t *)APP_BASE, APP_MEASURE_LEN);
+  sha256_final(&ctx, firmware_measurement);
 
   uint8_t uds[32] = {0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
                      0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
                      0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x00, 0x00,
                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-  uint8_t salt[32] = {0};
   uint8_t prk[32];
-  hkdf_extract(prk, salt, sizeof(salt), uds, sizeof(uds));
+  hkdf_extract(prk, firmware_measurement, sizeof(firmware_measurement), uds,
+               sizeof(uds));
   uint8_t cdi[32];
   uint8_t info[32] = {0};
   hkdf_expand(cdi, prk, sizeof(prk), info, sizeof(info));
@@ -133,8 +136,10 @@ int main(void) {
   uint8_t secret_key[64];
   crypto_ed25519_key_pair(secret_key, public_key, cdi);
 
-  UART_Send_String(USART2, "placeholder uds:");
+  UART_Send_String(USART2, "placeholder uds: ");
   UART_Send_Hex(USART2, uds, 32);
+  UART_Send_String(USART2, "firmware measurment: ");
+  UART_Send_Hex(USART2, firmware_measurement, 32);
 
   UART_Send_String(USART2, "prk: ");
   UART_Send_Hex(USART2, prk, 32);
