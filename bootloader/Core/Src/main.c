@@ -22,7 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "boot.h"
-#include "hmac.h"
+#include "hkdf.h"
+#include "monocypher-ed25519.h"
 #include "transmit.h"
 
 /* USER CODE END Includes */
@@ -106,20 +107,37 @@ int main(void) {
       0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
   };
   */
+  uint8_t uds[32] = {0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
+                     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
+                     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x00, 0x00,
+                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-  uint8_t test_key[20];
-  for (int i = 0; i < 20; i++) {
-    test_key[i] = 0x0b;
+  uint8_t salt[32] = {0};
+  uint8_t prk[32];
+  hkdf_extract(prk, salt, sizeof(salt), uds, sizeof(uds));
+  uint8_t cdi[32];
+  uint8_t info[32] = {0};
+  hkdf_expand(cdi, prk, sizeof(prk), info, sizeof(info));
+  uint8_t public_key[32];
+  uint8_t cdi_cp[32];
+  for (int i = 0; i < 32; ++i)
+    cdi_cp[i] = cdi[i];
+  {
   }
+  uint8_t secret_key[64];
+  crypto_ed25519_key_pair(secret_key, public_key, cdi);
 
-  const char *test_msg = "Hi There";
-  uint8_t hmac_out[SHA256_DIGEST_SIZE];
+  UART_Send_String(USART2, "placeholder uds:");
+  UART_Send_Hex(USART2, uds, 32);
 
-  hmac_sha256(hmac_out, test_key, sizeof(test_key), (const uint8_t *)test_msg,
-              8);
-
-  UART_Send_String(USART2, "HMAC test: ");
-  UART_Send_Hex(USART2, hmac_out, SHA256_DIGEST_SIZE);
+  UART_Send_String(USART2, "prk: ");
+  UART_Send_Hex(USART2, prk, 32);
+  UART_Send_String(USART2, "cdi: ");
+  UART_Send_Hex(USART2, cdi_cp, 32);
+  UART_Send_String(USART2, "public_key: ");
+  UART_Send_Hex(USART2, public_key, 32);
+  UART_Send_String(USART2, "private_key: ");
+  UART_Send_Hex(USART2, secret_key, 64);
 
   jump_to_app(APP_BASE);
   /* USER CODE END 2 */
