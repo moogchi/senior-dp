@@ -22,16 +22,15 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "boot.h"
-#include "hkdf.h"
-#include "monocypher-ed25519.h"
-#include "sha256.h"
+#include "keygen.h"
+#include "stm32f4xx_ll_bus.h"
 #include "transmit.h"
+#include <stdint.h>
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -98,56 +97,26 @@ int main(void) {
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  LL_AHB1_GRP1_DisableClock(LL_AHB1_GRP1_PERIPH_DMA1);
+
   const char boot_statement[] = "Successfully Booted \r\n";
   UART_Send_String(USART2, boot_statement);
 
-  /*
-  static const uint8_t dev_uds_placeholder[32] = {
-  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
-      0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
-      0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
-  };
-  */
-
-  // hash the firmware
-  SHA256_CTX ctx;
-  uint8_t firmware_measurement[32];
-  sha256_init(&ctx);
-  sha256_update(&ctx, (uint8_t *)APP_BASE, APP_MEASURE_LEN);
-  sha256_final(&ctx, firmware_measurement);
-
-  uint8_t uds[32] = {0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
-                     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
-                     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x00, 0x00,
-                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-  uint8_t prk[32];
-  hkdf_extract(prk, firmware_measurement, sizeof(firmware_measurement), uds,
-               sizeof(uds));
-  uint8_t cdi[32];
-  uint8_t info[32] = {0};
-  hkdf_expand(cdi, prk, sizeof(prk), info, sizeof(info));
   uint8_t public_key[32];
-  uint8_t cdi_cp[32];
-  for (int i = 0; i < 32; ++i)
-    cdi_cp[i] = cdi[i];
-  {
-  }
   uint8_t secret_key[64];
-  crypto_ed25519_key_pair(secret_key, public_key, cdi);
+  derive_alias_key(secret_key, public_key);
 
-  UART_Send_String(USART2, "placeholder uds: ");
-  UART_Send_Hex(USART2, uds, 32);
-  UART_Send_String(USART2, "firmware measurment: ");
-  UART_Send_Hex(USART2, firmware_measurement, 32);
-
-  UART_Send_String(USART2, "prk: ");
-  UART_Send_Hex(USART2, prk, 32);
-  UART_Send_String(USART2, "cdi: ");
-  UART_Send_Hex(USART2, cdi_cp, 32);
   UART_Send_String(USART2, "public_key: ");
   UART_Send_Hex(USART2, public_key, 32);
-  UART_Send_String(USART2, "private_key: ");
+  UART_Send_String(USART2, "secret_key: ");
+  UART_Send_Hex(USART2, secret_key, 64);
+
+  clear_key(public_key, sizeof(public_key));
+  clear_key(secret_key, sizeof(secret_key));
+
+  UART_Send_String(USART2, "cleared public_key: ");
+  UART_Send_Hex(USART2, public_key, 32);
+  UART_Send_String(USART2, "cleared secret_key: ");
   UART_Send_Hex(USART2, secret_key, 64);
 
   jump_to_app(APP_BASE);

@@ -61,6 +61,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/hkdf.c
     Core/Src/monocypher-ed25519.c
     Core/Src/monocypher.c
+    Core/Src/keygen.c
 )
 
 # Add include paths
