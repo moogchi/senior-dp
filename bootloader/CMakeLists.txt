@@ -38,6 +38,11 @@ enable_language(C ASM)
 add_executable(${CMAKE_PROJECT_NAME})
 
 option(USE_BLAKE2S "Use BLAKE2s instead of SHA-256 for measurement" OFF)
+option(DEBUG_PRINT_KEYS "Print derived keys over UART (INSECURE, debug only)" OFF)
+
+if(DEBUG_PRINT_KEYS)
+    message(WARNING "DEBUG_PRINT_KEYS=ON: key material will be printed over UART. Do not use for release builds.")
+endif()
 
 if(USE_BLAKE2S)
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
@@ -86,6 +91,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add project symbols (macros)
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined symbols
+    $<$<BOOL:${DEBUG_PRINT_KEYS}>:DEBUG_PRINT_KEYS>
 )
 
 # Remove wrong libob.a library dependency when using cpp files

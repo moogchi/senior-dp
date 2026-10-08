@@ -111,28 +111,39 @@ int main(void) {
   uint8_t public_key[32];
   uint8_t secret_key[64];
 
+#ifdef DEBUG_PRINT_KEYS
   // measure how long it takes
   uint32_t start = DWT->CYCCNT;
+#endif
+
   derive_alias_key(secret_key, public_key);
+
+#ifdef DEBUG_PRINT_KEYS
+
   uint32_t cycles = DWT->CYCCNT - start;
 
   UART_Send_String(USART2, "clock speed:");
   UART_Send_Dec(USART2, SystemCoreClock);
   UART_Send_String(USART2, "cycles: ");
   UART_Send_Dec(USART2, cycles);
+#endif
 
+#ifdef DEBUG_PRINT_KEYS
   UART_Send_String(USART2, "public_key: ");
   UART_Send_Hex(USART2, public_key, 32);
   UART_Send_String(USART2, "secret_key: ");
   UART_Send_Hex(USART2, secret_key, 64);
+#endif
 
   clear_key(public_key, sizeof(public_key));
   clear_key(secret_key, sizeof(secret_key));
 
+#ifdef DEBUG_PRINT_KEYS
   UART_Send_String(USART2, "cleared public_key: ");
   UART_Send_Hex(USART2, public_key, 32);
   UART_Send_String(USART2, "cleared secret_key: ");
   UART_Send_Hex(USART2, secret_key, 64);
+#endif
 
   jump_to_app(APP_BASE);
   /* USER CODE END 2 */

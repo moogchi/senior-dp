@@ -2,7 +2,7 @@
 checklist.md
 
 # build output
-build/
+bin/
 build*/
 cmake-build-*/
 *.log
