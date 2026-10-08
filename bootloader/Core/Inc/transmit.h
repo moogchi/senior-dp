@@ -11,4 +11,5 @@
 void UART_Send_Char(USART_TypeDef *USARTx, uint8_t data);
 void UART_Send_String(USART_TypeDef *USARTx, const char *str);
 void UART_Send_Hex(USART_TypeDef *USARTx, const uint8_t *buf, size_t len);
+void UART_Send_Dec(USART_TypeDef *USARTx, uint32_t value);
 #endif

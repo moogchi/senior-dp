@@ -21,8 +21,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "blake2.h"
 #include "boot.h"
 #include "keygen.h"
+#include "sha256.h"
 #include "stm32f4xx_ll_bus.h"
 #include "transmit.h"
 #include <stdint.h>
@@ -59,7 +61,6 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /**
@@ -69,6 +70,11 @@ static void MX_USART2_UART_Init(void);
 int main(void) {
 
   /* USER CODE BEGIN 1 */
+
+  // enable once, before timing anything
+  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+  DWT->CYCCNT = 0;
+  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 
   /* USER CODE END 1 */
 
@@ -104,7 +110,16 @@ int main(void) {
 
   uint8_t public_key[32];
   uint8_t secret_key[64];
+
+  // measure how long it takes
+  uint32_t start = DWT->CYCCNT;
   derive_alias_key(secret_key, public_key);
+  uint32_t cycles = DWT->CYCCNT - start;
+
+  UART_Send_String(USART2, "clock speed:");
+  UART_Send_Dec(USART2, SystemCoreClock);
+  UART_Send_String(USART2, "cycles: ");
+  UART_Send_Dec(USART2, cycles);
 
   UART_Send_String(USART2, "public_key: ");
   UART_Send_Hex(USART2, public_key, 32);

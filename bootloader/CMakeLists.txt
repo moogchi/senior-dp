@@ -29,13 +29,29 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 project(${CMAKE_PROJECT_NAME})
 message("Build type: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_C_FLAGS_DEBUG "-Os -g")
+set(CMAKE_C_FLAGS_DEBUG "-O2 -g")
 
 # Enable CMake support for ASM and C languages
 enable_language(C ASM)
 
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
+
+option(USE_BLAKE2S "Use BLAKE2s instead of SHA-256 for measurement" OFF)
+
+if(USE_BLAKE2S)
+    target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+        Core/Src/measure_blake2s.c
+        Core/Src/blake2s-ref.c
+    )
+else()
+    target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+        Core/Src/measure_sha256.c
+        Core/Src/sha256.c
+        Core/Src/hmac.c
+        Core/Src/hkdf.c
+    )
+endif()
 
 # Optimization and section-level linking (pinned for reproducibility)
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
@@ -56,12 +72,10 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     Core/Src/boot.c
     Core/Src/transmit.c
-    Core/Src/sha256.c
-    Core/Src/hmac.c
-    Core/Src/hkdf.c
     Core/Src/monocypher-ed25519.c
     Core/Src/monocypher.c
     Core/Src/keygen.c
+    Core/Src/utils.c
 )
 
 # Add include paths
